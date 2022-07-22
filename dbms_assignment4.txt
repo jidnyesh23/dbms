@@ -1,0 +1,263 @@
+Name: Jidnyesh Tushar Chaudhari.
+Roll no: 2215.
+DBMS_Assignment_4.
+
+# QUESTION 1
+
+a]
+
+CREATE OR REPLACE FUNCTION t1a()
+RETURNS TRIGGER AS'
+BEGIN
+IF NEW.ordered_qty < 5
+	THEN RAISE EXCEPTION ''ORDER CANNOT BE PLACED.'';
+	RETURN OLD;
+ELSE
+	RETURN NEW;
+END IF;
+END;
+'LANGUAGE'plpgsql';
+
+
+
+
+
+
+
+CREATE TRIGGER trig1
+BEFORE INSERT OR UPDATE
+ON item_orders
+FOR EACH ROW
+EXECUTE PROCEDURE t1a();
+
+
+
+
+
+
+fycsd001=> INSERT INTO item_orders VALUES(3,2,1);
+ERROR:  ORDER CANNOT BE PLACED.
+
+
+
+
+fycsd001=> INSERT INTO item_orders VALUES(3,2,10);
+INSERT 0 1
+
+
+fycsd001=> UPDATE item_orders
+fycsd001-> SET ordered_qty = 10
+fycsd001-> WHERE itemno = 2;
+UPDATE 1
+
+
+=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+b]
+
+INSERT INTO item_orders VALUES(5,6,110),(5,3,500);
+
+
+CREATE OR REPLACE FUNCTION t1b()
+RETURNS TRIGGER AS'
+BEGIN
+IF OLD.ordered_qty > 100
+	THEN RAISE EXCEPTION ''RECORDS CANNOT BE DELETED.'';
+	RETURN OLD;
+ELSE
+	RETURN OLD;
+END IF;
+END;
+'LANGUAGE'plpgsql';
+
+
+
+
+
+
+CREATE TRIGGER trig2
+BEFORE DELETE
+ON item_orders
+FOR EACH ROW
+EXECUTE PROCEDURE t1b();
+
+
+
+
+
+
+
+fycsd001=> DELETE FROM item_orders
+fycsd001-> WHERE itemno = 5;
+ERROR:  RECORDS CANNOT BE DELETED.
+
+
+
+
+
+
+fycsd001=> DELETE FROM item_orders
+fycsd001-> WHERE itemno = 2;
+DELETE 1
+
+
+=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+
+# QUESTION 2
+
+a]
+
+CREATE OR REPLACE FUNCTION t2a()
+RETURNS TRIGGER AS'
+BEGIN
+IF NEW.amount > ''40000'' AND NEW.amount < ''90000''
+	THEN RAISE NOTICE ''VALID ENTRY.'';
+	RETURN NEW;
+ELSE
+	RAISE EXCEPTION ''INVALID ENTRY.'';
+	RETURN OLD;
+END IF;
+END;
+'LANGUAGE'plpgsql';
+
+
+
+
+
+CREATE TRIGGER trig3
+AFTER INSERT OR UPDATE
+ON expense
+FOR EACH ROW
+EXECUTE PROCEDURE t2a();
+
+
+
+
+
+fycsd001=> INSERT INTO expense VALUES(7,50000);
+NOTICE:  VALID ENTRY.
+INSERT 0 1
+
+
+
+
+fycsd001=> INSERT INTO expense VALUES(8,120000);
+ERROR:  INVALID ENTRY.
+
+
+
+
+
+
+fycsd001=> UPDATE expense
+fycsd001-> SET amount = 80000
+fycsd001-> WHERE eid = 1;
+NOTICE:  VALID ENTRY.
+UPDATE 1
+
+
+
+
+
+fycsd001=> UPDATE expense
+fycsd001-> SET amount = 123
+fycsd001-> WHERE eid = 2;
+ERROR:  INVALID ENTRY.
+
+
+=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================#
+
+b]
+
+CREATE OR REPLACE FUNCTION t2b()
+RETURNS TRIGGER AS'
+BEGIN
+IF (NEW.return_date - NEW.departure_date) < 3
+	THEN RAISE EXCEPTION ''INVALID TRIP.'';
+	RETURN OLD;
+ELSE
+	RAISE NOTICE ''VALID TRIP.'';
+	RETURN NEW;
+END IF;
+END;
+'LANGUAGE'plpgsql';
+
+
+
+
+
+CREATE TRIGGER trig4
+AFTER INSERT OR UPDATE
+ON trip
+FOR EACH ROW
+EXECUTE PROCEDURE t2b();
+
+
+fycsd001=> INSERT INTO trip VALUES(10,'Akola','Pune','2020-01-24','2020-01-29',3);
+NOTICE:  VALID TRIP.
+INSERT 0 1
+
+
+
+
+
+
+
+fycsd001=> UPDATE trip
+fycsd001-> SET return_date = '2010-09-05'
+fycsd001-> WHERE tno = 5;
+ERROR:  INVALID TRIP.
+
+
+
+
+
+
+
+fycsd001=> UPDATE trip
+fycsd001-> SET return_date = '2010-09-20'
+fycsd001-> WHERE tno = 5;
+NOTICE:  VALID TRIP.
+UPDATE 1
+
+
+=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================#
+
+c]
+
+
+CREATE OR REPLACE FUNCTION t2c()
+RETURNS TRIGGER AS'
+DECLARE rec record;
+BEGIN
+SELECT * INTO rec FROM expense WHERE eid=old.tno;
+IF rec.amount > ''50000''
+	THEN RAISE EXCEPTION ''TRIP CANNOT BE DELETED.'';
+END IF;
+RETURN OLD;
+END;
+'LANGUAGE'plpgsql';
+
+
+
+
+CREATE TRIGGER trig5
+BEFORE DELETE
+ON trip
+FOR EACH ROW
+EXECUTE PROCEDURE t2c();
+
+
+
+
+fycsd001=> DELETE FROM trip WHERE tno = 4;
+ERROR:  TRIP CANNOT BE DELETED.
+
+
+fycsd001=> DELETE FROM trip WHERE tno = 6;
+DELETE 1
+
+
+

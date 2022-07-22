@@ -1,0 +1,497 @@
+-- Name: Jidnyesh Tushar Chaudhari.
+-- Roll no: 2215
+-- DBMS-Assignment_2.
+-- # Q1
+create table project(pno int primary key, p_name varchar(30), ptype varchar(20), duration int, status varchar(20));
+CREATE TABLE
+
+create table employee(eno int primary key, e_name varchar(20), qualification varchar(15), joindate date);
+CREATE TABLE
+
+create table proj_emp(pno int references project(pno) on update cascade on delete cascade, eno int references employee(eno) on update cascade on delete cascade, start_date date, no_of_hours_worked int, constraint prmkey primary key(pno,eno));
+CREATE TABLE
+
+insert into project values (1,'Technical Analysis','Finance',2,'completed');
+INSERT 0 1
+insert into project values(2,'Apartment','Construction',3,'ongoing');
+INSERT 0 1
+insert into project values(3,'5 Star Hotel','Construction',5,'ongoing');
+INSERT 0 1
+insert into project values(4,'Company Application','Software',1,'ongoing');
+INSERT 0 1
+insert into project values(5,'Data Analysis','Analytics',1,'completed');
+INSERT 0 1
+
+
+
+select select * from project;
+
+ pno |       p_name        |    ptype     | duration |  status
+-----+---------------------+--------------+----------+-----------
+   1 | Technical Analysis  | Finance      |        2 | completed
+   2 | Apartment           | Construction |        3 | ongoing
+   3 | 5 Star Hotel        | Construction |        5 | ongoing
+   4 | Company Application | Software     |        1 | ongoing
+   5 | Data Analysis       | Analytics    |        1 | completed
+(5 rows)
+
+
+
+
+
+insert into employee values (1,'Ranjeet','BTECH','2017-1-24');
+INSERT 0 1
+insert into employee values(2,'Rohit','MTECH','2015-5-20');
+INSERT 0 1
+insert into employee values(3,'Mayur','BCS','2018-9-24');
+INSERT 0 1
+insert into employee values (4,'Om','BCOM','2014-7-3');
+INSERT 0 1
+insert into employee values (5,'Pratik','BA','2020-5-5');
+INSERT 0 1
+
+
+select * from employee;
+
+ eno |    e_name     | qualification |  joindate
+-----+---------------+---------------+------------
+   1 | Ranjeet       | BTECH         | 2017-01-24
+   2 | Rohit         | MTECH         | 2015-05-20
+   3 | Mayur         | BCS           | 2018-09-24
+   4 | Om            | BCOM          | 2014-07-03
+   5 | Pratik        | BA            | 2020-05-05
+(5 rows)
+
+
+
+
+
+insert into proj_emp (pno,eno,no_of_hours_worked,start_date)values (5,1,5,'2017-5-24');
+INSERT 0 1
+insert into proj_emp (pno,eno,no_of_hours_worked,start_date)values (5,2,6,'2017-5-24');
+INSERT 0 1
+insert into proj_emp (pno,eno,no_of_hours_worked,start_date)values (2,5,8,'2020-7-7');
+INSERT 0 1
+insert into proj_emp (pno,eno,no_of_hours_worked,start_date)values (3,4,4,'2020-8-7');
+INSERT 0 1
+insert into proj_emp (pno,eno,no_of_hours_worked,start_date)values (4,3,5,'2018-10-2');
+INSERT 0 1
+insert into proj_emp (pno,eno,no_of_hours_worked,start_date)values (1,3,6,'2019-10-5');
+INSERT 0 1
+
+
+select * from proj_emp;
+
+ pno | eno | start_date | no_of_hours_worked
+-----+-----+------------+--------------------
+   5 |   1 | 2017-05-24 |                  5
+   5 |   2 | 2017-05-24 |                  6
+   2 |   5 | 2020-07-07 |                  8
+   3 |   4 | 2020-08-07 |                  4
+   4 |   3 | 2018-10-02 |                  5
+   1 |   3 | 2019-10-05 |                  6
+(6 rows)
+
+
+
+
+
+
+create function f1a(name varchar(30))
+returns int as'
+declare cnt int;
+begin
+select count(p_name) into cnt from project,proj_emp
+where project.pno=proj_emp.pno AND name = project.p_name;
+return cnt;
+end;
+'LANGUAGE'plpgsql';
+CREATE FUNCTION
+
+
+
+
+select f1a('Data Analysis') as no_of_employees;
+ no_of_employees
+-----------------
+               2
+(1 row)
+
+
+
+
+
+select f1a('Apartment') as no_of_employees;
+ no_of_employees
+-----------------
+               1
+(1 row)
+
+
+
+
+
+b]
+
+create function f1b()
+returns int as'
+declare cnt int;
+begin
+select count(eno) into cnt from employee
+where joindate < ''2018-8-7'';
+return cnt;
+end;
+'LANGUAGE'plpgsql';
+CREATE FUNCTION
+
+
+select f1b() as no_of_employees;
+ no_of_employees
+-----------------
+               3
+(1 row)
+
+
+
+
+
+
+
+c]
+
+CREATE OR REPLACE FUNCTION f1c(name varchar(30))
+RETURNS VOID AS'
+DECLARE pid int; pname varchar(30); p_type varchar(20); pdur int; pst varchar(20);
+BEGIN
+SELECT pno,p_name,ptype,duration,status INTO
+pid,pname,p_type,pdur,pst from project
+WHERE p_name=name;
+RAISE NOTICE ''pno  |  p_name  |  ptype  |  duration  |  status'';
+RAISE NOTICE ''========================================================'';
+RAISE NOTICE ''%    %    %    %    %'',pid,pname,p_type,pdur,pst;
+END;
+'LANGUAGE'plpgsql';
+CREATE FUNCTION
+
+
+select f1c('Apartment');
+
+ pno  |  p_name  |  ptype  |  duration  |  status
+========================================================
+  2    Apartment    Construction    3    ongoing
+ f1c
+-----
+
+(1 row)
+
+
+
+
+
+
+d]
+
+CREATE OR REPLACE FUNCTION f1d()
+RETURNS VOID AS'
+DECLARE id int; name varchar(30); type varchar(20); dur int;
+BEGIN
+SELECT pno,p_name,ptype,duration INTO
+id,name,type,dur FROM project
+WHERE status=''completed'';
+RAISE NOTICE ''pno  |      p_name      |  ptype  |  duration'';
+RAISE NOTICE ''================================================='';
+RAISE NOTICE ''%    %    %    %'',id,name,type,dur; 
+END;
+'LANGUAGE'plpgsql';
+
+CREATE FUNCTION
+
+
+
+
+
+select f1d();
+
+pno  |      p_name      |  ptype  |  duration
+=================================================
+1    Technical Analysis    Finance    2
+
+ f1d
+-----
+
+(1 row)
+
+
+
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+#Q2
+
+
+create table dept(deptno int primary key, dept_name varchar(20));
+CREATE TABLE
+
+create table salesman(sno int primary key, s_name varchar(30), start_year int, deptno int references dept(deptno) on update cascade on delete cascade);
+CREATE TABLE
+
+create table trip(tno int primary key, from_city varchar(20), to_city varchar(20), departure_date date, return_date date, sno int references salesman(sno) on update cascade on delete cascade);
+CREATE TABLE
+
+create table expense(eid int primary key references trip(tno) on update cascade on delete cascade, amount money);
+CREATE TABLE
+
+insert into dept values (1,'HR');
+INSERT 0 1
+insert into dept values (2,'MARKETING');
+INSERT 0 1
+insert into dept values(3,'SALES');
+INSERT 0 1
+
+
+select * from dept;
+
+ deptno | dept_name
+--------+-----------
+      1 | HR
+      2 | MARKETING
+      3 | SALES
+(3 rows)
+
+
+
+
+
+insert into salesman values (1,'Ranjeet',2015,1);
+INSERT 0 1
+insert into salesman values (2,'Rekha Maam',2020,1);
+INSERT 0 1
+insert into salesman values(3,'Pratik',2010,3);
+INSERT 0 1
+insert into salesman values(4,'Ashish',2012,2); 
+INSERT 0 1
+insert into salesman values(5,'Tanaya',2013,3);
+INSERT 0 1
+insert into salesman values(6,'Shruti',2008,2);
+INSERT 0 1
+
+
+select * from salesman;
+
+ sno |     s_name     | start_year | deptno
+-----+----------------+------------+--------
+   1 | Ranjeet        |       2015 |      1
+   2 | Rekha Maam     |       2020 |      1
+   3 | Pratik         |       2010 |      3
+   4 | Ashish         |       2012 |      2
+   5 | Tanaya         |       2013 |      3
+   6 | Shruti         |       2008 |      2
+(6 rows)
+
+
+
+
+insert into trip values (1,'Pune','Mumbai','2018-10-3','2018-10-10',4);
+INSERT 0 1
+insert into trip values (2,'Pune','Mumbai','2018-10-4','2018-10-20',5);
+INSERT 0 1
+insert into trip values (3,'Akola','Jammu','2021-5-5','2021-5-30',2);
+INSERT 0 1
+insert into trip values(4,'Pune','Cairo','2018-3-7','2018-3-30',3);
+INSERT 0 1
+insert into trip values(5,'Akola','Oregon','2010-9-3','2010-10-3',1);
+INSERT 0 1
+
+
+select * from trip;
+
+ tno | from_city | to_city | departure_date | return_date | sno
+-----+-----------+---------+----------------+-------------+-----
+   1 | Pune      | Mumbai  | 2018-10-03     | 2018-10-10  |   4
+   2 | Pune      | Mumbai  | 2018-10-04     | 2018-10-20  |   5
+   3 | Akola     | Jammu   | 2021-05-05     | 2021-05-30  |   2
+   4 | Pune      | Cairo   | 2018-03-07     | 2018-03-30  |   3
+   5 | Akola     | Oregon  | 2010-09-03     | 2010-10-03  |   1
+(5 rows)
+
+
+
+
+
+insert into expense values (1,50000);
+INSERT 0 1
+insert into expense values(2,40000);
+INSERT 0 1
+insert into expense values(3,400000);
+INSERT 0 1
+insert into expense values(4,1500000);
+INSERT 0 1
+insert into expense values(5,2000000);
+INSERT 0 1
+
+
+select * from expense;
+
+ eid |    amount
+-----+---------------
+   1 |    $50,000.00
+   2 |    $40,000.00
+   3 |   $400,000.00
+   4 | $1,500,000.00
+   5 | $2,000,000.00
+(5 rows)
+
+
+
+
+
+a]
+
+CREATE OR REPLACE FUNCTION f2a()
+RETURNS VOID AS'
+DECLARE tid int; fc varchar(20); tc varchar(20); ddt date; rdt date;
+BEGIN
+SELECT trip.tno,trip.from_city,trip.to_city,trip.departure_date,trip.return_date INTO
+tid,fc,tc,ddt,rdt FROM trip,expense
+WHERE trip.tno=expense.eid AND 
+amount = (SELECT MAX (amount) FROM expense);
+RAISE NOTICE ''tno |   from_city  |  to_city  |  departure_date  |  return_date '';
+RAISE NOTICE ''=================================================================='';
+RAISE NOTICE ''%        %        %        %        %'',tid,fc,tc,ddt,rdt;
+END;
+'LANGUAGE'plpgsql';
+CREATE FUNCTION
+
+
+
+
+
+
+select f2a();
+tno |   from_city  |  to_city  |  departure_date  |  return_date
+==================================================================
+ 5        Akola        Oregon        2010-09-03        2010-10-03
+
+ f2a
+-----
+
+(1 row)
+
+
+
+
+
+b]
+
+
+CREATE OR REPLACE FUNCTION f2b()
+RETURNS INT AS'
+DECLARE cnt int;
+BEGIN
+SELECT COUNT(tno) INTO cnt FROM trip
+WHERE from_city=''Pune'' AND to_city=''Mumbai'';
+RETURN cnt;
+END;
+'LANGUAGE'plpgsql';
+CREATE FUNCTION
+
+
+
+
+SELECT f2b();
+
+ f2b
+-----
+   2
+(1 row)
+
+
+
+
+
+c]
+
+
+CREATE OR REPLACE FUNCTION f2c(dname varchar(20))
+RETURNS VOID AS'
+DECLARE r RECORD;
+BEGIN
+RAISE NOTICE ''sno |  s_name | start_year'';
+RAISE NOTICE ''========================================'';
+FOR r IN
+SELECT * FROM salesman,dept
+WHERE salesman.deptno=dept.deptno AND dept.dept_name=dname
+LOOP
+RAISE NOTICE ''%	    %	        %'',r.sno,r.s_name,r.start_year;
+END LOOP;
+END;
+'LANGUAGE'plpgsql';
+CREATE FUNCTION
+
+
+
+
+select f2c('HR');
+
+sno |  s_name | start_year
+========================================
+1    Rajan        2015
+2    Markandey        2020
+
+ f2c
+-----
+
+(1 row)
+
+
+
+
+
+
+d]
+
+
+CREATE OR REPLACE FUNCTION f2d()
+RETURNS VOID AS'
+DECLARE r RECORD;
+BEGIN
+RAISE NOTICE ''tno | from_city | to_city | departure_date | return_date'';
+RAISE NOTICE ''=============================================================='';
+FOR r IN
+SELECT * FROM trip,salesman,dept
+WHERE trip.sno=salesman.sno AND salesman.deptno=dept.deptno AND dept.dept_name=''HR''
+LOOP
+RAISE NOTICE ''%       %       %       %       %'',r.tno,r.from_city,r.to_city,r.departure_date,r.return_date;
+END LOOP;
+END;
+'LANGUAGE'plpgsql';
+CREATE FUNCTION
+
+
+
+
+
+
+
+select f2d();
+
+tno | from_city | to_city | departure_date | return_date
+==============================================================
+3       Akola       Jammu       2021-05-05       2021-05-30
+5       Akola       Oregon       2010-09-03       2010-10-03
+
+ f2d
+-----
+
+(1 row)
+
+
+
+

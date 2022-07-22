@@ -1,0 +1,215 @@
+-- Name: Jidnyesh Tushar Chaudhari.
+-- Roll no: 2215
+-- DBMS-Assignment_3.
+
+#QUESTION 1
+
+CREATE OR REPLACE FUNCTION F1a(depname VARCHAR(20)) RETURNS refcursor AS'
+  DECLARE
+    ref refcursor;
+  BEGIN
+    OPEN ref FOR 
+     SELECT s_no,s_name,start_year FROM salesman WHERE salesman.deptno =(SELECT dept_no FROM dept WHERE dept_name=depname);
+     RETURN ref;
+    CLOSE ref;
+  END;
+'LANGUAGE 'plpgsql';
+
+BEGIN;
+BEGIN
+SELECT F1a('Sales');
+         f1a         
+---------------------
+ <unnamed portal 12>
+(1 row)
+
+
+
+
+FETCH ALL IN "<unnamed portal 12>";
+ s_no |   s_name    | start_year 
+------+-------------+------------
+  103 |  Mr.Rathod  |       2005
+  106 |  Mr.Shah    |       2014
+  107 |  Mr.Das     |       2010
+(3 rows)
+
+
+
+COMMIT;
+COMMIT
+
+
+
+
+CREATE OR REPLACE FUNCTION F1b() RETURNS refcursor AS'
+  DECLARE
+    ref refcursor;
+  BEGIN
+    OPEN ref FOR
+      SELECT trip_no,amount FROM expense
+      WHERE trip_no =(SELECT trip_no FROM trip WHERE departure_date=''2019-12-25'');
+    RETURN ref;
+    CLOSE ref;
+  END;
+'LANGUAGE'plpgsql';
+
+BEGIN;
+BEGIN
+
+
+SELECT F1b();
+        f1b         
+--------------------
+ <unnamed portal 1>
+(1 row)
+
+
+
+FETCH ALL IN "<unnamed portal 1>";
+ trip_no |   amount    
+---------+-------------
+     114 | ₹ 50,000.00
+(1 row)
+
+COMMIT;
+COMMIT
+
+======= C =======
+CREATE OR REPLACE FUNCTION F1c() RETURNS RECORD AS'
+  DECLARE
+    c1 CURSOR FOR 
+      SELECT trip_no,from_city,to_city,departure_date,return_date FROM trip
+      WHERE departure_date=''2019-2-2'';
+    rec RECORD;
+  BEGIN
+    OPEN c1;
+    FETCH FIRST FROM c1 INTO rec;
+    RETURN rec;
+  END;
+'LANGUAGE'plpgsql';
+
+
+
+
+SELECT * FROM trip;
+ trip_no | from_city  |  to_city   | departure_date | return_date | salesman 
+---------+------------+------------+----------------+-------------+----------
+     111 |  Pune      |  Calcutta  | 2014-11-18     | 2014-11-25  |      101
+     112 |  Mumbai    |  Calcutta  | 2012-08-01     | 2012-08-10  |      108
+     113 |  Pune      |  Mumbai    | 2012-08-10     | 2012-08-16  |      105
+     114 |  Banglore  |  Mumbai    | 2019-12-25     | 2020-01-10  |      104
+     115 |  Pune      |  Delhi     | 2011-03-26     | 2011-03-30  |      106
+     116 |  Chennai   |  Mysore    | 2019-02-02     | 2020-02-04  |      101
+     117 |  Agra      |  Mumbai    | 2018-08-15     | 2018-08-20  |      107
+     118 |  Pune      |  Mumbai    | 2019-08-01     | 2019-08-06  |      102
+(8 rows)
+
+BEGIN;
+BEGIN
+SELECT F1c();
+                        f1c                         
+----------------------------------------------------
+ (116," Chennai "," Mysore ",2019-02-02,2020-02-04)
+(1 row)
+
+UPDATE trip SET departure_date='2020-2-2' WHERE current of c1;
+UPDATE 1
+
+COMMIT;
+COMMIT
+
+
+
+
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+
+#QUESTION 2
+
+
+
+CREATE OR REPLACE FUNCTION F2a(projname VARCHAR(20)) RETURNS refcursor AS'
+  DECLARE
+    ref refcursor;
+  BEGIN
+    OPEN ref FOR
+      SELECT e_name,qualification,joindate FROM employee 
+      LEFT JOIN emp_proj ON employee.eno=emp_proj.eno
+      WHERE emp_proj.pno=(SELECT pno FROM project WHERE p_name=projname);
+    RETURN ref;
+    CLOSE ref;
+  END;
+'LANGUAGE'plpgsql';
+
+BEGIN;
+BEGIN
+
+SELECT F2a('Krishna Plaza');
+        f2a         
+--------------------
+ <unnamed portal 3>
+(1 row)
+
+FETCH ALL IN "<unnamed portal 3>";
+ e_name | qualification |  joindate  
+--------+---------------+------------
+ Yash   | PhD           | 2018-02-05
+(1 row)
+
+SELECT F2a('Linux');
+        f2a         
+--------------------
+ <unnamed portal 2>
+(1 row)
+
+FETCH ALL IN "<unnamed portal 2>";
+ e_name | qualification |  joindate  
+--------+---------------+------------
+ Sanika | MCA           | 2016-06-08
+ Raj    | B.Tech        | 2015-09-08
+ Yash   | PhD           | 2018-02-05
+(3 rows)
+
+COMMIT;
+COMMIT
+
+
+CREATE OR REPLACE FUNCTION F2b() RETURNS refcursor AS'
+  DECLARE
+    ref refcursor;
+  BEGIN
+    OPEN ref FOR
+      SELECT project.pno,project.p_name,project.ptype,project.duration,project.status,
+        emp_proj.start_date,emp_proj.no_of_hours_worked FROM project,emp_proj
+        WHERE project.pno=emp_proj.pno AND start_date=''2020-2-2'';
+    RETURN ref;
+    CLOSE ref;
+  END;
+'LANGUAGE'plpgsql';
+
+BEGIN;
+BEGIN
+SELECT F2b();
+        f2b         
+--------------------
+ <unnamed portal 4>
+(1 row)
+
+FETCH ALL IN "<unnamed portal 4>";
+ pno |    p_name     |    ptype     | duration |  status  | start_date | no_of_hours_worked 
+-----+---------------+--------------+----------+----------+------------+--------------------
+   4 | Krishna Plaza | Construction |       11 |  Ongoing | 2020-02-02 |                100
+(1 row)
+
+ OMMIT;
+COMMIT

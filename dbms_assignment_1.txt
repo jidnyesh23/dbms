@@ -1,0 +1,336 @@
+-- Name: Jidnyesh Tushar Chaudhari.
+-- Roll no: 2215
+-- DBMS-Assignment_1.
+
+#QUESTION 1
+
+fycsd010=> CREATE TABLE items(i_no int PRIMARY KEY,description text,weight decimal(5,2),cost decimal(5,2));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "items_pkey" for table "items"
+CREATE TABLE
+fycsd010=> INSERT INTO items VALUES(21,'coconut oil',22.12,90.63);
+INSERT 0 1
+fycsd010=> INSERT INTO items VALUES(22,'parle',30.00,20.21);
+INSERT 0 1
+fycsd010=> INSERT INTO items VALUES(23,'sugar',500.00,100.13);
+INSERT 0 1
+fycsd010=> INSERT INTO items VALUES(24,'wheat',500.00,50.31);
+INSERT 0 1
+fycsd010=> INSERT INTO items VALUES(25,'nutrichoice',200.00,50.39);
+INSERT 0 1                                                      ^
+
+fycsd010=> CREATE TABLE customers(c_no int PRIMARY KEY,c_name char(50),addr varchar(50),cu_city char(20));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "customers_pkey" for table "customers"
+CREATE TABLE
+fycsd010=> INSERT INTO customers VALUES(1,'Mr.Joshi','kothrud','pune');
+INSERT 0 1
+fycsd010=> INSERT INTO customers VALUES(2,'Mr.Vijay','katraj','pune');
+INSERT 0 1
+fycsd010=> INSERT INTO customers VALUES(3,'Mrs.Seema','kothrud','pune');
+INSERT 0 1
+fycsd010=> INSERT INTO customers VALUES(4,'Mrs.Kaveri','hadapsar','pune');
+INSERT 0 1
+fycsd010=> INSERT INTO customers VALUES(5,'Mr.Rahul','katraj','pune');
+INSERT 0 1
+
+fycsd010=> CREATE TABLE orders(o_no int PRIMARY KEY,o_date date,c_no int references customers(c_no)on update cascade on delete cascade);
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "orders_pkey" for table "orders"
+CREATE TABLE
+fycsd010=> INSERT INTO orders VALUES(10,'2013-10-03',1);
+INSERT 0 1
+fycsd010=> INSERT INTO orders VALUES(11,'2013-10-03',2);
+INSERT 0 1
+fycsd010=> INSERT INTO orders VALUES(12,'2013-04-10',3);
+INSERT 0 1
+fycsd010=> INSERT INTO orders VALUES(13,'2013-04-10',4);
+INSERT 0 1
+fycsd010=> INSERT INTO orders VALUES(14,'2013-05-10',5);
+INSERT 0 1
+fycsd010=> INSERT INTO orders VALUES(15,'2013-06-10',3);
+INSERT 0 1
+fycsd010=> INSERT INTO orders VALUES(16,'2013-06-10',4);
+INSERT 0 1
+fycsd010=> INSERT INTO customers VALUES(6,'Mr.Ram','dadar','mumbai');
+INSERT 0 1
+
+fycsd010=> CREATE TABLE item_order(i_no int references items (i_no)on update cascade on delete cascade,o_no int references orders(o_no)on update cascade on delete cascade,orders_quantity int,total int);
+CREATE TABLE
+fycsd010=> INSERT INTO item_order VALUES(21,10,3,3);
+INSERT 0 1
+fycsd010=> INSERT INTO item_order VALUES(22,11,7,7);
+INSERT 0 1
+fycsd010=> INSERT INTO item_order VALUES(23,12,4,4);
+INSERT 0 1
+fycsd010=> INSERT INTO item_order VALUES(24,13,20,20);
+INSERT 0 1
+fycsd010=> INSERT INTO item_order VALUES(25,14,21,21);
+INSERT 0 1
+fycsd010=> INSERT INTO item_order VALUES(21,15,15,15);
+INSERT 0 1
+fycsd010=> INSERT INTO item_order VALUES(22,16,15,15);
+INSERT 0 1
+
+fycsd010=> SELECT* from customers;
+ c_no |                       c_name                       |   addr   |       cu_city        
+------+----------------------------------------------------+----------+----------------------
+    1 | Mr.Joshi                                           | kothrud  | pune                
+    2 | Mr.Vijay                                           | katraj   | pune                
+    3 | Mrs.Seema                                          | kothrud  | pune                
+    4 | Mrs.Kaveri                                         | hadapsar | pune                
+    5 | Mr.Rahul                                           | katraj   | pune                
+    6 | Mr.Ram                                             | dadar    | mumbai              
+(6 rows)
+
+fycsd010=> SELECT* from items;
+ i_no | description | weight |  cost  
+------+-------------+--------+--------
+   21 | coconut oil |  22.12 |  90.63
+   22 | parle       |  30.00 |  20.21
+   23 | sugar       | 500.00 | 100.13
+   24 | wheat       | 500.00 |  50.31
+   25 | nutrichoice | 200.00 |  50.39
+(5 rows)
+
+fycsd010=> SELECT* from orders;
+ o_no |   o_date   | c_no 
+------+------------+------
+   10 | 2013-10-03 |    1
+   11 | 2013-10-03 |    2
+   12 | 2013-04-10 |    3
+   13 | 2013-04-10 |    4
+   14 | 2013-05-10 |    5
+   15 | 2013-06-10 |    3
+   16 | 2013-06-10 |    4
+(7 rows)
+
+fycsd010=> SELECT* from item_order;
+ i_no | o_no | orders_quantity | total 
+------+------+-----------------+-------
+   21 |   10 |               3 |     3
+   22 |   11 |               7 |     7
+   23 |   12 |               4 |     4
+   24 |   13 |              20 |    20
+   25 |   14 |              21 |    21
+   21 |   15 |              15 |    15
+   22 |   16 |              15 |    15
+(7 rows)
+
+#a
+
+fycsd010=> CREATE VIEW CityDetail as
+fycsd010-> select *from customers where cu_city='pune';
+CREATE VIEW
+
+fycsd010=> select*from CityDetail;
+ c_no |                       c_name                       |   addr   |       cu_city        
+------+----------------------------------------------------+----------+----------------------
+    1 | Mr.Joshi                                           | kothrud  | pune                
+    2 | Mr.Vijay                                           | katraj   | pune                
+    3 | Mrs.Seema                                          | kothrud  | pune                
+    4 | Mrs.Kaveri                                         | hadapsar | pune                
+    5 | Mr.Rahul                                           | katraj   | pune                
+(5 rows)
+
+fycsd010=> select*from CityDetail where addr='kothrud';
+ c_no |                       c_name                       |  addr   |       cu_city        
+------+----------------------------------------------------+---------+----------------------
+    1 | Mr.Joshi                                           | kothrud | pune                
+    3 | Mrs.Seema                                          | kothrud | pune                
+(2 rows)
+
+#b                                                           
+
+fycsd010=> create view DateDetail as
+select customers.c_no,customers.c_name,customers.addr,customers.cu_city,orders.o_no from customers,orders
+fycsd010->  where customers.c_no=orders.c_no AND o_date='2013-10-03';
+CREATE VIEW
+
+fycsd010=> select*from DateDetail;
+ c_no |                       c_name                       |  addr   |       cu_city        | o_no 
+------+----------------------------------------------------+---------+----------------------+------
+    1 | Mr.Joshi                                           | kothrud | pune                 |   10
+    2 | Mr.Vijay                                           | katraj  | pune                 |   11
+(2 rows)
+
+fycsd010=> select*from DateDetail where cu_city='pune';
+ c_no |                       c_name                       |  addr   |       cu_city        | o_no 
+------+----------------------------------------------------+---------+----------------------+------
+    1 | Mr.Joshi                                           | kothrud | pune                 |   10
+    2 | Mr.Vijay                                           | katraj  | pune                 |   11
+(2 rows)
+
+fycsd010=> select*from DateDetail where c_name='Mr.Joshi';
+ c_no |                       c_name                       |  addr   |       cu_city        | o_no 
+------+----------------------------------------------------+---------+----------------------+------
+    1 | Mr.Joshi                                           | kothrud | pune                 |   10
+(1 row)
+
+#c
+
+fycsd010=> create view min5 as
+fycsd010-> select orders.o_no,orders.o_date,orders.c_no,items.i_no,items.description,item_order.orders_quantity from orders,items,item_order
+where items.i_no=item_order.i_no AND orders.o_no=item_order.o_no AND item_order.orders_quantity >= 5;
+CREATE VIEW
+
+fycsd010=> select*from min5;
+ o_no |   o_date   | c_no | i_no | description | orders_quantity 
+------+------------+------+------+-------------+-----------------
+   11 | 2013-10-03 |    2 |   22 | parle       |               7
+   13 | 2013-04-10 |    4 |   24 | wheat       |              20
+   14 | 2013-05-10 |    5 |   25 | nutrichoice |              21
+   15 | 2013-06-10 |    3 |   21 | coconut oil |              15
+   16 | 2013-06-10 |    4 |   22 | parle       |              15
+(5 rows)
+
+*************************************************************************************************************************************************************
+
+#QUESTION 2
+
+fycsd010=> CREATE TABLE movie(mID int PRIMARY KEY,tittle varchar(20),year int,director varchar(20));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "movie_pkey" for table "movie"
+CREATE TABLE
+fycsd010=> INSERT INTO movie VALUES(1,'DDLJ',1995,'yash chopra');
+INSERT 0 1
+fycsd010=> INSERT INTO movie VALUES(2,'taal',1999,'subhash ghai');
+INSERT 0 1
+fycsd010=> INSERT INTO movie VALUES(3,'pardes',1996,'subhash ghai');
+INSERT 0 1
+fycsd010=> INSERT INTO movie VALUES(4,'bajirao mastani',2015,'sanjay bhansali');
+INSERT 0 1
+fycsd010=> INSERT INTO movie VALUES(5,'tamasha',2015,'imtiaz ali');
+INSERT 0 1
+fycsd010=> INSERT INTO movie VALUES(6,'padmavat',2017,'sanjay bhansali');
+INSERT 0 1
+fycsd010=> INSERT INTO movie VALUES(7,'kalank',2019,'abhishek verman');
+INSERT 0 1
+fycsd010=> INSERT INTO movie VALUES(8,'kashmora',2017,'amir khan');
+INSERT 0 1
+
+fycsd010=> CREATE TABLE reviewer(rID int PRIMARY KEY,name varchar(20));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "reviewer_pkey" for table "reviewer"
+CREATE TABLE
+fycsd010=> INSERT INTO reviewer VALUES(20,'Mrs.Meera');
+INSERT 0 1
+fycsd010=> INSERT INTO reviewer VALUES(22,'Mr.Rahul');
+INSERT 0 1
+fycsd010=> INSERT INTO reviewer VALUES(23,'Mr.Joshi');
+INSERT 0 1
+fycsd010=> INSERT INTO reviewer VALUES(21,'Mr.Aditya');
+INSERT 0 1
+fycsd010=> INSERT INTO reviewer VALUES(24,'Mrs.Seema');
+INSERT 0 1
+
+fycsd010=> CREATE TABLE rating (rID int references reviewer (rID),mID int references movie(mID),stars int,ratingDate date);
+CREATE TABLE                                 
+fycsd010=> INSERT INTO rating VALUES(20,1,4,'2/4/2018');
+INSERT 0 1
+fycsd010=> INSERT INTO rating VALUES(22,2,5,'2/4/2017');
+INSERT 0 1
+fycsd010=> INSERT INTO rating VALUES(23,3,4,'2/5/2015');
+INSERT 0 1
+fycsd010=> INSERT INTO rating VALUES(24,4,4,'6/23/2018');
+INSERT 0 1
+fycsd010=> INSERT INTO rating VALUES(24,5,1,'6/23/2018');
+INSERT 0 1
+fycsd010=> INSERT INTO rating VALUES(20,6,4,'2/24/2019');
+INSERT 0 1
+fycsd010=> INSERT INTO rating VALUES(21,8,4,'6/22/2019');
+INSERT 0 1
+
+fycsd010=> select* from movie;
+ mid |     tittle      | year |      director       
+-----+-----------------+------+---------------------
+   1 | DDLJ            | 1995 | yash chopra
+   2 | taal            | 1999 | subhash ghai
+   3 | pardes          | 1996 | subhash ghai
+   4 | bajirao mastani | 2015 | sanjay bhansali
+   5 | tamasha         | 2015 | imtiaz ali
+   6 | padmavat        | 2017 | sanjay bhansali
+   7 | kalank          | 2019 | abhishek verman
+   8 | kashmora        | 2017 | amir khan
+(8 rows)
+
+fycsd010=> select* from reviewer;
+ rid |   name    
+-----+-----------
+  20 | Mrs.Meera
+  22 | Mr.Rahul
+  23 | Mr.Joshi
+  21 | Mr.Aditya
+  24 | Mrs.Seema
+(5 rows)
+
+fycsd010=> select * from rating;
+ rid | mid | stars | ratingdate 
+-----+-----+-------+------------
+  20 |   1 |     4 | 2018-02-04
+  22 |   2 |     5 | 2017-02-04
+  23 |   3 |     4 | 2015-02-05
+  24 |   4 |     4 | 2018-06-23
+  24 |   5 |     1 | 2018-06-23
+  20 |   6 |     4 | 2019-02-24
+  21 |   8 |     4 | 2019-06-22
+(7 rows)
+
+#a
+
+fycsd010=> CREATE VIEW movie3 as
+select movie.mid,movie.tittle,movie.year,movie.director,rating.rid,rating.stars,ratingdate from movie,rating
+where movie.mid=rating.mid and rating.stars>3;
+CREATE VIEW
+
+fycsd007=> select * from movie3;
+ mid |      title      | year |    director     | rid | stars | ratingdate 
+-----+-----------------+------+-----------------+-----+-------+------------
+   1 | DDLJ            | 1995 | yash chopra     |  20 |     4 | 2018-02-04
+   2 | Taal            | 1999 | subhash ghai    |  22 |     5 | 2017-02-04
+   3 | Pardes          | 1996 | subhash ghai    |  23 |     4 | 2015-02-05
+   4 | Bajirao Mastani | 2015 | sanjay bhansali |  24 |     4 | 2018-06-23
+   6 | Padmavat        | 2017 | sanjay bhansali |  20 |     4 | 2019-02-24
+   8 | kashmora        | 2017 | amir khan       |  21 |     4 | 2019-06-22
+(6 rows)
+
+1.)
+fycsd007=> Select * FROM movie3 WHERE year=2015;
+ mid |      title      | year |    director     | rid | stars | ratingdate 
+-----+-----------------+------+-----------------+-----+-------+------------
+   4 | Bajirao Mastani | 2015 | sanjay bhansali |  24 |     4 | 2018-06-23
+(1 row)
+
+2.)
+fycsd007=> Select * FROM movie3 WHERE director='subhash ghai';
+ mid | title  | year |   director   | rid | stars | ratingdate 
+-----+--------+------+--------------+-----+-------+------------
+   2 | Taal   | 1999 | subhash ghai |  22 |     5 | 2017-02-04
+   3 | Pardes | 1996 | subhash ghai |  23 |     4 | 2015-02-05
+(2 rows)
+
+3.)
+fycsd007=> Select * FROM movie3 WHERE stars=4 AND ratingDate='2/4/2018';
+ mid | title | year |  director   | rid | stars | ratingdate 
+-----+-------+------+-------------+-----+-------+------------
+   1 | DDLJ  | 1995 | yash chopra |  20 |     4 | 2018-02-04
+(1 row)
+
+#b
+
+fycsd007=> CREATE VIEW year1 as
+fycsd007-> SELECT movie.mid,movie.title,movie.year,movie.director,rating.rid,rating.stars,rating.ratingdate FROM movie,rating
+fycsd007-> WHERE movie.mid=rating.mid AND movie.year between 2016 and 2018;
+CREATE VIEW
+fycsd007=> SELECT * FROM year1;
+ mid |  title   | year |    director     | rid | stars | ratingdate 
+-----+----------+------+-----------------+-----+-------+------------
+   6 | Padmavat | 2017 | sanjay bhansali |  20 |     4 | 2019-02-24
+   8 | kashmora | 2017 | amir khan       |  21 |     4 | 2019-06-22
+(2 rows)
+
+1.)
+
+fycsd007=> SELECT title FROM year1 where title like 'k%';
+  title   
+----------
+ kashmora
+(1 row)
+
+**************************************************************************************************************************************************************
+
